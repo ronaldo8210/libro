@@ -6,6 +6,7 @@
 ***********************************************************************/
 #include "scheduler.hpp"
 
+#include "../task/task.hpp"
 #include "processor.hpp"
 
 namespace co {
@@ -26,7 +27,7 @@ Scheduler::~Scheduler() {
 
 
 void Scheduler::create_task(const TaskF &task_fn, const TaskOpt &task_opt) {
-  Task task = new Task();
+  Task *task = new Task(task_fn, task_opt.stack_size_);
 
   add_runnable_task(task);
 }
@@ -36,7 +37,7 @@ void Scheduler::start(int min_thread_cnt, int max_thread_cnt) {
   main_proc->process();
 }
 
-void stop() {
+void Scheduler::stop() {
   if (stop_) {
     return;  
   }
@@ -44,9 +45,9 @@ void stop() {
   stop_ = true;
 
   size_t n = processors_.size();
-  for (int idx = 0; i < n; ++i) {
+  for (int idx = 0; idx < n; ++idx) {
     if (processors_[idx]) {
-      processors_[idx]->notify_condition();
+      //processors_[idx]->notify_condition();
       delete processors_[idx];
       processors_[idx] = NULL;
     }
@@ -66,7 +67,7 @@ uint64_t Scheduler::current_yield_task_count() {
 }
 
 void Scheduler::add_runnable_task(Task *task) {
-  return 0;
+
 }
 
 void Scheduler::create_process_thread() {

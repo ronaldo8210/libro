@@ -1,14 +1,7 @@
 /***********************************************************************
-#   > File Name   : sam_yield.cpp
+#   > File Name   : syntax_helper.h
 #   > Author      : ronaldo
 #   > Description : 
-#   > Create Time : 2019-06-13 09:19:57
+#   > Create Time : 2019-06-14 11:09:20
 ***********************************************************************/
-#include "coroutine.hpp"
 
-int main(int argc, char **argv) {
-  
-  co_sched.start();
-
-  return 0;
-}

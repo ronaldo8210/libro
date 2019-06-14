@@ -1,14 +1,19 @@
 /***********************************************************************
-#   > File Name   : sam_yield.cpp
+#   > File Name   : ts_queue.hpp
 #   > Author      : ronaldo
 #   > Description : 
-#   > Create Time : 2019-06-13 09:19:57
+#   > Create Time : 2019-06-14 15:51:13
 ***********************************************************************/
-#include "coroutine.hpp"
+#pragma once
 
-int main(int argc, char **argv) {
-  
-  co_sched.start();
+namespace co {
 
-  return 0;
+template<typename T, bool ThreadSafe = true>
+class TSQueue {
+ public:
+  TSQueue() {
+
+  }
+};
+
 }

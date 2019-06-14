@@ -6,5 +6,7 @@
 ***********************************************************************/
 #pragma once
 
+#include "scheduler/scheduler.hpp"
+
 #define co_sched ::co::Scheduler::getInstance()
 

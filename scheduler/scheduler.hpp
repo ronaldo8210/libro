@@ -7,11 +7,13 @@
 #pragma once
 
 #include <deque>
+#include <functional>
 
 namespace co {
 
 class Processor;
 struct TaskOpt;
+class Task;
 
 class Scheduler {
  public:
@@ -54,6 +56,6 @@ class Scheduler {
   std::deque<Processor*> processors_;
 
   bool stop_;
-}
+};
 
 }  // namespace co
