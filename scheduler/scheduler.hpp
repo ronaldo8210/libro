@@ -58,4 +58,10 @@ class Scheduler {
   bool stop_;
 };
 
+inline Scheduler& Scheduler::getInstance() {
+  // 函数第一次被调用时才生成静态的全局唯一Scheduler实例  
+  static Scheduler obj;
+  return obj;
+}
+
 }  // namespace co

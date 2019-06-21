@@ -11,12 +11,6 @@
 
 namespace co {
 
-inline Scheduler& Scheduler::getInstance() {
-  // 函数第一次被调用时才生成静态的全局唯一Scheduler实例  
-  static Scheduler obj;
-  return obj;
-}
-
 Scheduler::Scheduler() : min_thread_cnt_(1), max_thread_cnt_(1), task_cnt_(0) {
   processors_.push_back(new Processor(this, 0));
 }
@@ -25,9 +19,10 @@ Scheduler::~Scheduler() {
   stop();
 }
 
-
 void Scheduler::create_task(const TaskF &task_fn, const TaskOpt &task_opt) {
   Task *task = new Task(task_fn, task_opt.stack_size_);
+  task->set_deleter(Deleter(Scheduler::delete_task, this));
+  task->id_ = 0;
 
   add_runnable_task(task);
 }
@@ -45,7 +40,7 @@ void Scheduler::stop() {
   stop_ = true;
 
   size_t n = processors_.size();
-  for (int idx = 0; idx < n; ++idx) {
+  for (size_t idx = 0; idx < n; ++idx) {
     if (processors_[idx]) {
       //processors_[idx]->notify_condition();
       delete processors_[idx];

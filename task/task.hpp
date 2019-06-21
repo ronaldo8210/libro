@@ -56,9 +56,9 @@ class Task {
   }
   
  private:
-  // 禁止直接拷贝构造和赋值
-  //Task(const Task &) = delete;
-  //Task(Task &&) = delete;
+  // task实例不能被拷贝、被移动，禁止编译器合成拷贝构造函数和移动构造函数
+  Task(const Task &) = delete;
+  Task(Task &&) = delete;
 
   // static函数相当于C的全局函数
   static void static_run(intptr_t ptr);

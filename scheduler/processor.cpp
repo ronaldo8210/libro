@@ -9,7 +9,8 @@
 namespace co {
 
 Processor::Processor(Scheduler *scheduler, int id) : scheduler_(scheduler), id_(id) {
-
+  int a = 1;
+  int b = 2;
 }
 
 void Processor::process() {
