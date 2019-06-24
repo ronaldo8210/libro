@@ -43,6 +43,12 @@ class Scheduler {
   Scheduler();
   ~Scheduler();
 
+  // 阻止拷贝和移动操作
+  Scheduler(const Scheduler&) = delete;
+  Scheduler(Scheduler&&) = delete;
+  Scheduler& operator=(const Scheduler&) = delete;
+  Scheduler& operator=(Scheduler&&) = delete;
+
   // 将一个协程加入可执行队列中
   void add_runnable_task(Task *task);
 

@@ -61,6 +61,7 @@ uint64_t Scheduler::current_yield_task_count() {
   return 0;
 }
 
+// 需要保证线程安全
 void Scheduler::add_runnable_task(Task *task) {
 
 }
