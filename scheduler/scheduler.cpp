@@ -12,6 +12,7 @@
 namespace co {
 
 Scheduler::Scheduler() : min_thread_cnt_(1), max_thread_cnt_(1), task_cnt_(0) {
+  // 构造函数执行完毕之前this指针是否有效？
   processors_.push_back(new Processor(this, 0));
 }
 
@@ -61,7 +62,7 @@ uint64_t Scheduler::current_yield_task_count() {
   return 0;
 }
 
-// 需要保证线程安全
+// 会多线程调用吗？
 void Scheduler::add_runnable_task(Task *task) {
 
 }

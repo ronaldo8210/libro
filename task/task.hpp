@@ -14,6 +14,7 @@
 namespace co {
 
 enum TaskState {
+  init,
   runnable,
   block,
   done
@@ -26,7 +27,7 @@ struct TaskOpt {
 
 class Processor;
 
-class Task {
+class Task : public TSQueueHook {
  public:
   typedef std::function<void()> TaskF;
   Task(const TaskF &fn, size_t stack_size);

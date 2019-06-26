@@ -38,6 +38,7 @@ class Context {
 
   inline void swap_in() {
     swapcontext(&get_tls_context(), &ctx_);
+    // process过程切出点
   }
 
   inline void swap_to() {
@@ -46,6 +47,7 @@ class Context {
 
   inline void swap_out() {
     swapcontext(&ctx_, &get_tls_context());
+    // process过程恢复执行点
   }
 
   // 不可以是inline，必须有函数调用过程
