@@ -24,8 +24,9 @@ void Scheduler::create_task(const TaskF &task_fn, const TaskOpt &task_opt) {
   Task *task = new Task(task_fn, task_opt.stack_size_);
   task->set_deleter(Deleter(Scheduler::delete_task, this));
   task->id_ = 0;
+  ++task_cnt_;
 
-  add_runnable_task(task);
+  add_new_task(task);
 }
 
 void Scheduler::start(int min_thread_cnt, int max_thread_cnt) {
@@ -63,8 +64,17 @@ uint64_t Scheduler::current_yield_task_count() {
 }
 
 // 会多线程调用吗？
-void Scheduler::add_runnable_task(Task *task) {
+void Scheduler::add_new_task(Task *task) {
+  std::size_t pcount = processors_.size();
+  auto proc = processors_[0];
+  proc->add_new_task(task);
+}
 
+// 协程任务析构和任务统计相对应，统一聚集在Scheduler中实现
+void Scheduler::delete_task(RefObject* task, void *arg) {
+  Scheduler *self = (Scheduler*)arg;
+  delete task;
+  --(self->task_cnt_);
 }
 
 void Scheduler::create_process_thread() {

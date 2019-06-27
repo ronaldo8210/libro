@@ -4,21 +4,23 @@ SCHEDULER_DIR=${CUR_DIR}/scheduler
 TASK_DIR=${CUR_DIR}/task
 SAMPLE_DIR=${CUR_DIR}/sample
 COMMON_DIR=${CUR_DIR}/common
+CONTEXT_DIR=${CUR_DIR}/context
 
 INC_DIR= -I${CUR_DIR} \
 		 -I${SCHEDULER_DIR} \
 		 -I${TASK_DIR} \
 		 -I${SAMPLE_DIR} \
-		 -I${COMMON_DIR}
+		 -I${COMMON_DIR} \
+		 -I${CONTEXT_DIR}
 
 SRC = ${wildcard ${SCHEDULER_DIR}/*.cpp} \
 	  ${wildcard ${TASK_DIR}/*.cpp} \
-      ${wildcard ${SAMPLE_DIR}/*.cpp}
+      ${wildcard ${SAMPLE_DIR}/sam_yield.cpp}
 OBJ = ${patsubst %.cpp, %.o, ${SRC}}
 
 TARGET=main
 CC=g++
-CCFLAGS=-g -std=c++11 -Wall ${INC_DIR}
+CCFLAGS=-g -std=c++11 -lpthread -Wall ${INC_DIR}
 
 ${TARGET}: ${OBJ}
 	${CC} ${OBJ} -o $@

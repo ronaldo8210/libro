@@ -12,8 +12,9 @@
 namespace co {
 
 class Processor;
-struct TaskOpt;
+class RefObject;
 class Task;
+struct TaskOpt;
 
 class Scheduler {
  public:
@@ -24,7 +25,12 @@ class Scheduler {
   void create_task(const TaskF &task_fn, const TaskOpt &task_opt);
 
   void start(int min_thread_cnt = 1, int max_thread_cnt = 1);
+
   void stop();
+
+  inline bool is_stop() {
+    return stop_;  
+  }
 
   // 当前是否没有协程可执行
   bool empty();
@@ -50,7 +56,10 @@ class Scheduler {
   Scheduler& operator=(Scheduler&&) = delete;
 
   // 将一个协程加入可执行队列中
-  void add_runnable_task(Task *task);
+  void add_new_task(Task *task);
+
+  // 析构一个协程，必须保证协程对象引用计数是1时才执行
+  static void delete_task(RefObject *task, void *arg);
 
   void create_process_thread();
 
@@ -61,7 +70,7 @@ class Scheduler {
 
   std::deque<Processor*> processors_;
 
-  bool stop_;
+  bool stop_ = false;
 };
 
 inline Scheduler& Scheduler::getInstance() {

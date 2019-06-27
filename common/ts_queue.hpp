@@ -87,7 +87,11 @@ class TSQueue {
     return count_;  
   }
 
- public:
+  inline lock_t& lock_ref() {
+    return *lock_;
+  }
+
+ private:
   TSQueueHook *head_;
   TSQueueHook *tail_;
   std::size_t count_;

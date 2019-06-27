@@ -6,30 +6,44 @@
 ***********************************************************************/
 #pragma once
 
+#include <condition_variable>
 #include "../common/ts_queue.hpp"
+#include "../task/task.hpp"
 
 namespace co {
 
-class Task;
 class Scheduler;
-class TaskQueue;
 
 class Processor {
  friend class Scheduler;
 
  public:
-  static Process* get_current_process();
+  static Processor* & get_current_processor();
 
   static Scheduler* get_current_scheduler();
 
-  static void static_co_yield();
+  static Task* get_current_task();
+
+  // 频繁调用，置为inline类型
+  inline static void static_co_yield();
 
  private:
-  Scheduler *scheduler_;
+  // 将新增协程任务加入new_queue
+  void add_new_task(Task *task);
 
-  // 执行process方法的线程的线程id
-  int id_;
+  // 将new_queue中的协程全部移入runnable_queue
+  bool move_new_queue();
 
+  bool gc();
+
+  // 频繁调用，置为inline类型
+  inline void co_yield();
+
+  // 用于添加协程任务线程与处理协程任务线程的同步
+  void wait_condition();
+
+  void notify_condition();
+      
   // 线程安全Task队列
   typedef TSQueue<Task, true> TS_TaskQueue;
 
@@ -38,22 +52,18 @@ class Processor {
   TS_TaskQueue new_queue_;
   TSQueue<Task, false> gc_queue_;
 
-  Task* runnable_task_ = nullptr;
+  Task *runnable_task_ = nullptr;
+  Task *next_task_ = nullptr;
 
-  // 用于添加协程任务线程与处理协程任务线程的同步
-  bool wait_condition();
   std::condition_variable_any cv_;
   bool waiting_;
 
-  // 将新增协程任务加入new_queue
-  bool add_task(Task *task);
+  Scheduler *scheduler_;
 
-  // 将new_queue中的协程全部移入runnable_queue
-  bool add_new_queue();
+  // 执行process方法的线程的线程id
+  int id_;
 
-  bool gc();
-
-  void co_yiled();
+  uint64_t switch_count_ = 0;
 
  // for friend class Scheduler 
  private:
@@ -61,5 +71,16 @@ class Processor {
 
   void process();
 };
+
+inline void Processor::static_co_yield() {
+  auto proc = get_current_processor();
+  proc->co_yield();
+}
+
+inline void Processor::co_yield() {
+  Task *task = get_current_task();
+  ++(task->yield_cnt_);
+  task->swap_out();
+}
 
 }  // namespace co

@@ -7,6 +7,8 @@
 
 namespace co {
 
+class RefObject;  // 前置声明，否则Deleter编译不过
+
 class Deleter {
  public:
   typedef void (*func_t)(RefObject *ptr, void *arg);
@@ -20,7 +22,7 @@ class Deleter {
 
   void operator()(RefObject *ptr) {
     if (func_) {
-      func_(ptr, arg);
+      func_(ptr, arg_);
     } else {
       delete ptr;
     }
@@ -32,18 +34,25 @@ class Deleter {
   // 例如：设置为Deleter实例所属的Task所属的Scheduler实例的地址
   void * arg_;
 };
-  
+
 class RefObject {
  public:
+  RefObject() {
+
+  }
+
+  virtual ~RefObject() {}
+
   // 必须赋值一份，因为Scheduler中生成的Deleter临时变量马上会被销毁
-  void set_deleter(Deleter &deleter) {
+  void set_deleter(Deleter /*&*/deleter) {  // 用ref会编译不过
     deleter_ = deleter;
   }
+
  private:
   Deleter deleter_;   
 };
 
-class SharedRefObject {
+class SharedRefObject : public RefObject {
 
 };
 
