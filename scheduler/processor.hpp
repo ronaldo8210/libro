@@ -24,6 +24,7 @@ class Processor {
 
   static Task* get_current_task();
 
+  // 正在执行的协程主动让出cpu
   // 频繁调用，置为inline类型
   inline static void static_co_yield();
 

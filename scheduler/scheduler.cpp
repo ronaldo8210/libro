@@ -21,7 +21,7 @@ Scheduler::~Scheduler() {
 }
 
 void Scheduler::create_task(const TaskF &task_fn, const TaskOpt &task_opt) {
-  Task *task = new Task(task_fn, task_opt.stack_size_);
+  Task *task = new Task(task_fn, task_opt.stack_size_ ? task_opt.stack_size_ : 1 * 1024);
   task->set_deleter(Deleter(Scheduler::delete_task, this));
   task->id_ = 0;
   ++task_cnt_;

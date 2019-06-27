@@ -6,7 +6,13 @@
 ***********************************************************************/
 #pragma once
 
+#include "common/syntax_helper.hpp"
 #include "scheduler/scheduler.hpp"
+#include "scheduler/processor.hpp"
+
+#define go ::co::__go()-
+
+#define co_yield ::co::Processor::static_co_yield()
 
 #define co_sched ::co::Scheduler::getInstance()
 

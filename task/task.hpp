@@ -24,7 +24,7 @@ enum TaskState {
 
 struct TaskOpt {
   bool affinity_ = false;
-  size_t stack_size_;
+  size_t stack_size_ = 0;
 };
 
 class Processor;
