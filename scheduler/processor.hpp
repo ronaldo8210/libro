@@ -7,6 +7,9 @@
 #pragma once
 
 #include <condition_variable>
+#include <functional>
+#include <memory>
+#include "../common/clock.hpp"
 #include "../common/ts_queue.hpp"
 #include "../task/task.hpp"
 
@@ -28,6 +31,23 @@ class Processor {
   // 频繁调用，置为inline类型
   inline static void static_co_yield();
 
+  struct SuspendEntry {
+    std::shared_ptr<Task> tkPtr_;
+    uint64_t id_;
+  };
+
+  // 一般在协程任务内部调用，挂起当前正在执行的协程
+  // 仅是将协程任务从runnable_queue移到wait_queue
+  static SuspendEntry suspend();
+
+  static SuspendEntry suspend(FastSteadyClock::duration dur);
+
+  static SuspendEntry suspend(FastSteadyClock::time_point tp);
+
+  // 由时间轮timerloop线程调用
+  // 将协程任务从wait_queue重新压入runnable_queue
+  static void wakeup(const SuspendEntry& entry, const std::function<void()> &functor = nullptr);
+
  private:
   // 将新增协程任务加入new_queue
   void add_new_task(Task *task);
@@ -44,6 +64,10 @@ class Processor {
   void wait_condition();
 
   void notify_condition();
+
+  SuspendEntry suspend_by_coroutine_self(Task *task);
+
+  void wakeup_by_timer(std::shared_ptr<Task> taskPtr, uint64_t id, const std::function<void()> &functor);
       
   // 线程安全Task队列
   typedef TSQueue<Task, true> TS_TaskQueue;

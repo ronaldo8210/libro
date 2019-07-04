@@ -79,6 +79,31 @@ class TSQueue {
     return count_;
   }
 
+  // 从队列中移除一个元素，元素可位于任何位置
+  // 只有指针操作，时间复杂度O(1)
+  inline bool erase_without_lock(T *node) {
+    assert(node->prev_ != nullptr);
+    assert(node == tail_ || node->next_ != nullptr);
+
+    node->prev_->next_ = node->next_;
+    node->next_->prev_ = node->prev_;
+
+    if (node == tail_) {
+      tail_ = node->prev_;
+    }
+
+    node->prev_ = nullptr;
+    node->next_ = nullptr;
+
+    --count_;
+    
+    return true;
+  }
+
+  inline void next_without_lock(T *node, T* &out) {
+    out = (T*)node->next_;
+  }
+
   inline bool empty() {
     return !count_;
   }
@@ -89,6 +114,11 @@ class TSQueue {
 
   inline lock_t& lock_ref() {
     return *lock_;
+  }
+
+  // 非频繁调用，不用inline
+  void set_lock(lock_t *lock) {
+    lock_ = lock;
   }
 
  private:

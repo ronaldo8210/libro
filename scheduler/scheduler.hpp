@@ -8,6 +8,7 @@
 
 #include <deque>
 #include <functional>
+#include "common/timer.hpp"
 
 namespace co {
 
@@ -19,6 +20,8 @@ struct TaskOpt;
 class Scheduler {
  public:
   typedef std::function<void()> TaskF;
+
+  typedef Timer<std::function<void()>> TimerType;
 
   inline static Scheduler& getInstance();
 
@@ -43,6 +46,10 @@ class Scheduler {
 
   // 当前协程切换总次数
   uint64_t current_yield_task_count();
+
+  inline TimerType & timer() {
+    return *timer_;  // TODO
+  }
 
  private:
   // 禁止从外部直接构造该类型实例
@@ -69,6 +76,8 @@ class Scheduler {
   uint64_t task_cnt_; 
 
   std::deque<Processor*> processors_;
+
+  TimerType *timer_ = nullptr;
 
   bool stop_ = false;
 };
