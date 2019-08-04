@@ -8,6 +8,8 @@
 
 #include "ev_util.hpp"
 #include "fd_context.hpp"
+#include "fd_mgr.hpp"
+#include "sys/epoll.h"
 #include <thread>
 
 namespace co {
@@ -25,7 +27,7 @@ void EpollReactor::run() {
   for (int i = 0; i < n; ++i) {
     struct epoll_event &ev = evs[i];
     int fd = ev.data.fd;
-    FdContextPtr ctx = FdMgr::getInstance().fd_context(fd);
+    FdContextPtr ctx = FdMgr::getInstance().get_fd_context(fd);
     if (!ctx) {
       continue;    
     }
