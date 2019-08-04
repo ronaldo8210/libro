@@ -34,6 +34,14 @@ class Processor {
   struct SuspendEntry {
     std::shared_ptr<Task> tkPtr_;
     uint64_t id_;
+    
+    bool operator==(const SuspendEntry &rhs) {
+      return /* tkPtr_ == rhs.tkPtr_ && */ id_ == rhs.id_;
+    }
+
+    bool is_expire() const {
+      return Processor::is_expire(*this);
+    }
   };
 
   // 一般在协程任务内部调用，挂起当前正在执行的协程
@@ -47,6 +55,8 @@ class Processor {
   // 由时间轮timerloop线程调用
   // 将协程任务从wait_queue重新压入runnable_queue
   static void wakeup(const SuspendEntry& entry, const std::function<void()> &functor = nullptr);
+
+  static bool is_expire(const SuspendEntry &entry);
 
  private:
   // 将新增协程任务加入new_queue
@@ -67,20 +77,25 @@ class Processor {
 
   SuspendEntry suspend_by_coroutine_self(Task *task);
 
-  void wakeup_by_timer(std::shared_ptr<Task> taskPtr, uint64_t id, const std::function<void()> &functor);
+  void wakeup_by_self(std::shared_ptr<Task> taskPtr, uint64_t id, const std::function<void()> &functor);
       
   // 线程安全Task队列
   typedef TSQueue<Task, true> TS_TaskQueue;
 
   TS_TaskQueue runnable_queue_;
+
   TS_TaskQueue wait_queue_;
+
   TS_TaskQueue new_queue_;
+
   TSQueue<Task, false> gc_queue_;
 
   Task *runnable_task_ = nullptr;
+
   Task *next_task_ = nullptr;
 
   std::condition_variable_any cv_;
+
   bool waiting_;
 
   Scheduler *scheduler_;

@@ -185,13 +185,14 @@ Processor::SuspendEntry Processor::suspend_by_coroutine_self(Task *task) {
   return {std::shared_ptr<Task>(task), id};
 }
 
+// 被reactor线程和timer线程调用
 void Processor::wakeup(const SuspendEntry &entry, const std::function<void()> &functor) {
   std::shared_ptr<Task> tkPtr = entry.tkPtr_;
   auto proc = tkPtr->proc_;
-  proc->wakeup_by_timer(tkPtr, entry.id_, functor);
+  proc->wakeup_by_self(tkPtr, entry.id_, functor);
 }
 
-void Processor::wakeup_by_timer(std::shared_ptr<Task> taskPtr, uint64_t id, const std::function<void()> &functor) {
+void Processor::wakeup_by_self(std::shared_ptr<Task> taskPtr, uint64_t id, const std::function<void()> &functor) {
   Task *task = taskPtr.get();
 
   if (functor) {
@@ -203,4 +204,9 @@ void Processor::wakeup_by_timer(std::shared_ptr<Task> taskPtr, uint64_t id, cons
   runnable_queue_.push_without_lock(task);
 }
 
+bool Processor::is_expire(const SuspendEntry &entry) {
+  // TODO
+  
+  return false;
+}
 }  // namespace co
