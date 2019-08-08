@@ -71,6 +71,7 @@ class Scheduler {
   void create_process_thread();
 
   int min_thread_cnt_;
+
   int max_thread_cnt_;
 
   uint64_t task_cnt_; 

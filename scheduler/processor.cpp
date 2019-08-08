@@ -53,6 +53,7 @@ void Processor::add_new_task(Task *task) {
 }
 
 bool Processor::move_new_queue() {
+  //runnable_queue_.push(new_queue_.pop_all());
   return true;
 }
 
@@ -118,6 +119,22 @@ void Processor::process() {
           break;
 
         case TaskState::done:
+          {
+            runnable_queue_.next(runnable_task_, next_task_);
+            if (!next_task_) {
+              if (move_new_queue()) {
+                runnable_queue_.next(runnable_task_, next_task_);
+              }
+            }
+
+            runnable_queue_.erase(runnable_task_);
+            gc_queue_.push(runnable_task_);
+
+            std::unique_lock<TS_TaskQueue::lock_t> lock(runnable_queue_.lock_ref());
+            runnable_task_ = next_task_;
+            next_task_ = nullptr;
+          }
+          break;
         default:
           break;
       }
@@ -138,11 +155,21 @@ void Processor::wait_condition() {
 }
 
 void Processor::notify_condition() {
-
+  std::unique_lock<TS_TaskQueue::lock_t> lock(new_queue_.lock_ref());
+  if (waiting_) {
+    cv_.notify_all();
+  }
 }
 
-bool Processor::gc() {
-  return true;  
+// 可以开启一个单独的线程去做GC资源回收
+// 通过gc_queue和主线程做生产者消费者
+void Processor::gc() {
+  /* TODO
+  auto list = gc_queue_.pop_all();
+  for (Task &tk : list) {
+    // 将重置后的Task回收到对象池中 
+  }
+  list.clear(); */
 }
 
 Processor::SuspendEntry Processor::suspend() {

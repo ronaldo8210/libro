@@ -65,7 +65,7 @@ class Processor {
   // 将new_queue中的协程全部移入runnable_queue
   bool move_new_queue();
 
-  bool gc();
+  void gc();
 
   // 频繁调用，置为inline类型
   inline void co_yield();

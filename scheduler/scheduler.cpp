@@ -30,6 +30,21 @@ void Scheduler::create_task(const TaskF &task_fn, const TaskOpt &task_opt) {
 }
 
 void Scheduler::start(int min_thread_cnt, int max_thread_cnt) {
+  if (min_thread_cnt < 1) {
+    min_thread_cnt = std::thread::hardware_concurrency();
+  }
+
+  if (max_thread_cnt < min_thread_cnt) {
+    max_thread_cnt = min_thread_cnt;
+  }
+
+  min_thread_cnt_ = min_thread_cnt;
+  max_thread_cnt_ = max_thread_cnt;
+
+  for (int i = 0; i < min_thread_cnt_ - 1; ++i) {
+    create_process_thread();
+  }
+  
   auto main_proc = processors_[0];
   main_proc->process();
 }
@@ -56,17 +71,21 @@ uint64_t Scheduler::task_count() {
 }
 
 uint64_t Scheduler::current_task_id() {
-  return 0;
+  Task *tk = Processor::get_current_task();
+  return tk ? tk->id_ : 0;
 }
 
 uint64_t Scheduler::current_yield_task_count() {
-  return 0;
+  Task *tk = Processor::get_current_task();
+  return tk ? tk->yield_cnt_ : 0;
 }
 
 // 会多线程调用吗？
 void Scheduler::add_new_task(Task *task) {
   std::size_t pcount = processors_.size();
-  auto proc = processors_[0];
+  // TODO
+  std::size_t idx = task->id_ % pcount;
+  auto proc = processors_[idx];
   proc->add_new_task(task);
 }
 
@@ -78,7 +97,12 @@ void Scheduler::delete_task(RefObject* task, void *arg) {
 }
 
 void Scheduler::create_process_thread() {
-  processors_.push_back(new Processor(this, processors_.size()));
+  auto p = new Processor(this, processors_.size());
+  std::thread thrd([this, p] {
+          p->process();
+          });
+  thrd.detach();
+  processors_.push_back(p);
 }
 
 }  // namespace co

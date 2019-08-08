@@ -121,6 +121,14 @@ class TSQueue {
     lock_ = lock;
   }
 
+  inline void next(T *ptr, T *&out) {
+
+  }
+
+  inline bool erase(T *) {
+
+  }
+
  private:
   TSQueueHook *head_;
   TSQueueHook *tail_;
